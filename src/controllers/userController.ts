@@ -14,3 +14,47 @@ export const getUsers = async (
         res.status(500).json({ message: `Err finding users: ${error.message}` });
     }
 };
+
+export const getUser = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+
+    const { cognitoId } = req.params;
+    try { 
+        const user = await prisma.user.findUnique(
+            {
+                where: {
+                    cognitoId: cognitoId
+                }
+            }
+        );
+        res.json(user);
+    } catch (error: any) {
+        res.status(500).json({ message: `Err retriving users: ${error.message}` });
+    }
+}; 
+
+export const postUser = async(req: Request, res: Response) => {
+    try { 
+
+        const { 
+            username,
+            cognitoId,
+            profilePictureUrl = "i1.jpg",
+            teamId = 1,
+        } = req.body;
+
+        const newUser = await prisma.user.create({
+            data: {
+                username,
+                cognitoId,
+                profilePictureUrl,
+                teamId,
+            },
+        });
+        res.json({ message: "User Create Successfully", newUser });
+    } catch (error: any) {
+        res.status(500).json({ message: `Err finding users: ${error.message}` });
+    }
+}
